@@ -1,5 +1,5 @@
 # afclean-higienizacao
-af-clean-agendamentos
+afclean-agendamentos
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>

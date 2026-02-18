@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0a8fdd">
+    <meta name="description" content="AF Clean - Sistema de Gestão para Higienização de Estofados">
+    <title>AF Clean - Sistema de Gestão</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Icons -->
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Background Animation -->
+    <div class="bubbles" id="bubbles"></div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo-section">
+                <div class="logo">
+                    <span class="logo-af">AF</span>
+                    <div class="water-effect"></div>
+                </div>
+                <div class="logo-text">
+                    <h1>AF <span>Clean</span></h1>
+                    <p>Higienização de estofados em geral</p>
+                </div>
+            </div>
+            <button class="install-btn" id="installBtn" onclick="installApp()">
+                <i class="fas fa-download"></i> 
+                <span class="btn-text">Instalar App</span>
+            </button>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="nav-tabs">
+            <button class="nav-tab active" data-section="dashboard" onclick="showSection('dashboard')">
+                <i class="fas fa-home"></i> 
+                <span>Dashboard</span>
+            </button>
+            <button class="nav-tab" data-section="agendamento" onclick="showSection('agendamento')">
+                <i class="fas fa-calendar-plus"></i> 
+                <span>Novo</span>
+            </button>
+            <button class="nav-tab" data-section="clientes" onclick="showSection('clientes')">
+                <i class="fas fa-users"></i> 
+                <span>Clientes</span>
+            </button>
+            <button class="nav-tab" data-section="servicos" onclick="showSection('servicos')">
+                <i class="fas fa-clipboard-check"></i> 
+                <span>Serviços</span>
+            </button>
+            <button class="nav-tab" data-section="config" onclick="showSection('config')">
+                <i class="fas fa-cog"></i> 
+                <span>Config</span>
+            </button>
+        </nav>
+
+        <!-- Main Content -->
+        <main>
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="content-section active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon today">
+                            <i class="fas fa-calendar-day"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="stat-today">0</h3>
+                            <p>Hoje</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon pending">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="stat-pending">0</h3>
+                            <p>Pendentes</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon completed">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="stat-completed">0</h3>
+                            <p>Concluídos</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon revenue">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="stat-revenue">R$ 0</h3>
+                            <p>Mês</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card reminders-card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-bell"></i> Lembretes de Retorno (6 meses)</h2>
+                        <span class="badge" id="reminderCount">0</span>
+                    </div>
+                    <div id="reminders-list" class="client-list">
+                        <div class="empty-state">
+                            <i class="fas fa-bell-slash"></i>
+                            <h3>Nenhum lembrete para hoje</h3>
+                            <p>Os clientes aparecerão aqui quando precisarem de retorno</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-calendar-alt"></i> Próximos Serviços</h2>
+                    </div>
+                    <div id="upcoming-services" class="client-list">
+                        <div class="empty-state">
+                            <i class="fas fa-calendar"></i>
+                            <h3>Nenhum serviço agendado</h3>
+                            <p>Clique em "Novo" para adicionar um agendamento</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Agendamento Section -->
+            <section id="agendamento" class="content-section">
+                <div class="card form-card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-user-plus"></i> Novo Agendamento</h2>
+                    </div>
+                    
+                    <form id="agendamentoForm" class="modern-form">
+                        <div class="form-row">
+                            <div class="form-group floating">
+                                <input type="text" id="clientName" required placeholder=" ">
+                                <label for="clientName"><i class="fas fa-user"></i> Nome do Cliente *</label>
+                            </div>
+                            <div class="form-group floating">
+                                <input type="tel" id="clientPhone" required placeholder=" " oninput="formatPhone(this)">
+                                <label for="clientPhone"><i class="fas fa-phone"></i> Telefone *</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group floating">
+                            <input type="text" id="clientAddress" required placeholder=" ">
+                            <label for="clientAddress"><i class="fas fa-map-marker-alt"></i> Endereço Completo *</label>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group floating">
+                                <input type="date" id="serviceDate" required>
+                                <label for="serviceDate" class="active"><i class="fas fa-calendar"></i> Data do Serviço *</label>
+                            </div>
+                            <div class="form-group floating">
+                                <input type="time" id="serviceTime" required>
+                                <label for="serviceTime" class="active"><i class="fas fa-clock"></i> Horário *</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group floating with-button">
+                            <input type="text" id="mapsLink" placeholder=" ">
+                            <label for="mapsLink"><i class="fas fa-map"></i> Localização Google Maps</label>
+                            <button type="button" class="input-btn" onclick="getCurrentLocation()" title="Obter localização atual">
+                                <i class="fas fa-location-arrow"></i>
+                            </button>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group select-group">
+                                <label><i class="fas fa-couch"></i> Tipo de Serviço</label>
+                                <div class="service-types">
+                                    <label class="service-type">
+                                        <input type="radio" name="serviceType" value="sofa" checked>
+                                        <span><i class="fas fa-couch"></i> Sofá</span>
+                                    </label>
+                                    <label class="service-type">
+                                        <input type="radio" name="serviceType" value="colchao">
+                                        <span><i class="fas fa-bed"></i> Colchão</span>
+                                    </label>
+                                    <label class="service-type">
+                                        <input type="radio" name="serviceType" value="cadeira">
+                                        <span><i class="fas fa-chair"></i> Cadeiras</span>
+                                    </label>
+                                    <label class="service-type">
+                                        <input type="radio" name="serviceType" value="tapete">
+                                        <span><i class="fas fa-rug"></i> Tapete</span>
+                                    </label>
+                                    <label class="service-type">
+                                        <input type="radio" name="serviceType" value="carro">
+                                        <span><i class="fas fa-car"></i> Carro</span>
+                                    </label>
+                                    <label class="service-type">
+                                        <input type="radio" name="serviceType" value="outros">
+                                        <span><i class="fas fa-ellipsis-h"></i> Outros</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group floating">
+                            <input type="number" id="serviceValue" step="0.01" placeholder=" " min="0">
+                            <label for="serviceValue"><i class="fas fa-dollar-sign"></i> Valor do Serviço (R$)</label>
+                        </div>
+
+                        <div class="form-group floating">
+                            <textarea id="serviceNotes" rows="3" placeholder=" "></textarea>
+                            <label for="serviceNotes"><i class="fas fa-sticky-note"></i> Observações</label>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" onclick="showSection('dashboard')">
+                                <i class="fas fa-times"></i> Cancelar
+                            </button>
+                            <button type="submit" class="btn btn-primary btn-glow">
+                                <i class="fas fa-save"></i> Salvar Agendamento
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Clientes Section -->
+            <section id="clientes" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-users"></i> Lista de Clientes</h2>
+                        <button class="btn btn-small btn-primary" onclick="showSection('agendamento')">
+                            <i class="fas fa-plus"></i> Novo
+                        </button>
+                    </div>
+                    
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchClient" placeholder="Buscar por nome, telefone ou endereço..." onkeyup="searchClients()">
+                    </div>
+                    
+                    <div id="clientsList" class="client-list"></div>
+                </div>
+            </section>
+
+            <!-- Serviços Section -->
+            <section id="servicos" class="content-section">
+                <div id="serviceDetails">
+                    <div class="card empty-card">
+                        <div class="empty-state large">
+                            <i class="fas fa-clipboard-list"></i>
+                            <h3>Gerenciar Serviço</h3>
+                            <p>Selecione um cliente na aba "Clientes" para iniciar ou finalizar um atendimento</p>
+                            <button class="btn btn-primary" onclick="showSection('clientes')">
+                                <i class="fas fa-users"></i> Ver Clientes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Config Section -->
+            <section id="config" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-database"></i> Backup de Dados</h2>
+                    </div>
+                    <p class="card-description">
+                        Faça backup regularmente para não perder seus agendamentos ao trocar de celular ou navegador.
+                    </p>
+                    
+                    <div class="backup-actions">
+                        <button class="btn btn-primary btn-large" onclick="exportarDados()">
+                            <i class="fas fa-download"></i>
+                            <div class="btn-content">
+                                <strong>Exportar Backup</strong>
+                                <span>Salvar todos os dados em arquivo</span>
+                            </div>
+                        </button>
+                        
+                        <div class="import-box">
+                            <label for="backupFile" class="btn btn-secondary btn-large">
+                                <i class="fas fa-upload"></i>
+                                <div class="btn-content">
+                                    <strong>Restaurar Backup</strong>
+                                    <span>Carregar dados de arquivo salvo</span>
+                                </div>
+                            </label>
+                            <input type="file" id="backupFile" accept=".json" onchange="importarDados(this)" hidden>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-chart-bar"></i> Relatórios</h2>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Data Inicial</label>
+                            <input type="date" id="reportStart">
+                        </div>
+                        <div class="form-group">
+                            <label>Data Final</label>
+                            <input type="date" id="reportEnd">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="generateReport()">
+                        <i class="fas fa-file-alt"></i> Gerar Relatório
+                    </button>
+                    <div id="reportResult"></div>
+                </div>
+
+                <div class="card about-card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-info-circle"></i> Sobre o App</h2>
+                    </div>
+                    <div class="about-content">
+                        <div class="logo-large">AF</div>
+                        <h3>AF Clean App <span class="version">v2.0</span></h3>
+                        <p>Sistema completo de gestão para higienização de estofados</p>
+                        
+                        <div class="features-list">
+                            <div class="feature-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Funciona 100% offline</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Backup automático</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Lembretes inteligentes</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Assinatura digital</span>
+                            </div>
+                        </div>
+
+                        <p class="copyright">© 2024 AF Clean - Todos os direitos reservados</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <!-- Checklist Modal -->
+    <div id="checklistModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-camera"></i> Checklist - Antes do Serviço</h2>
+                <button class="close-btn" onclick="closeModal('checklistModal')">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="photo-upload-area" onclick="document.getElementById('beforePhotos').click()">
+                    <div class="upload-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <h3>Adicionar Fotos do Estofado</h3>
+                    <p>Tire fotos do estado atual antes da limpeza</p>
+                    <span class="upload-hint">Toque aqui ou arraste fotos</span>
+                    <input type="file" id="beforePhotos" multiple accept="image/*" capture="environment" hidden onchange="handlePhotoUpload(this, 'before')">
+                </div>
+                
+                <div id="beforePreview" class="photo-preview-grid"></div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('checklistModal')">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button class="btn btn-primary btn-glow" onclick="startService()">
+                    <i class="fas fa-play"></i> Iniciar Serviço
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Finish Modal -->
+    <div id="finishModal" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2><i class="fas fa-flag-checkered"></i> Finalizar Serviço</h2>
+                <button class="close-btn" onclick="closeModal('finishModal')">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="photo-upload-area" onclick="document.getElementById('afterPhotos').click()">
+                    <div class="upload-icon">
+                        <i class="fas fa-camera-retro"></i>
+                    </div>
+                    <h3>Fotos do Resultado Final</h3>
+                    <p>Mostre o trabalho concluído!</p>
+                    <input type="file" id="afterPhotos" multiple accept="image/*" capture="environment" hidden onchange="handlePhotoUpload(this, 'after')">
+                </div>
+                
+                <div id="afterPreview" class="photo-preview-grid"></div>
+
+                <div class="section-divider">
+                    <span>Pagamento</span>
+                </div>
+
+                <div class="payment-methods">
+                    <label class="payment-method">
+                        <input type="radio" name="payment" value="dinheiro" onchange="selectPayment('dinheiro')">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <span>Dinheiro</span>
+                    </label>
+                    <label class="payment-method">
+                        <input type="radio" name="payment" value="pix" onchange="selectPayment('pix')">
+                        <i class="fas fa-qrcode"></i>
+                        <span>PIX</span>
+                    </label>
+                    <label class="payment-method">
+                        <input type="radio" name="payment" value="cartao" onchange="selectPayment('cartao')">
+                        <i class="fas fa-credit-card"></i>
+                        <span>Cartão</span>
+                    </label>
+                    <label class="payment-method">
+                        <input type="radio" name="payment" value="transferencia" onchange="selectPayment('transferencia')">
+                        <i class="fas fa-university"></i>
+                        <span>Transf.</span>
+                    </label>
+                </div>
+
+                <div class="form-group floating">
+                    <input type="number" id="finalValue" step="0.01" placeholder=" " min="0">
+                    <label for="finalValue">Valor Final (R$)</label>
+                </div>
+
+                <div class="section-divider">
+                    <span>Assinatura do Cliente</span>
+                </div>
+
+                <div class="signature-box">
+                    <canvas id="signaturePad"></canvas>
+                    <span class="signature-hint">Assinhe aqui</span>
+                </div>
+                
+                <button type="button" class="btn btn-text" onclick="clearSignature()">
+                    <i class="fas fa-eraser"></i> Limpar Assinatura
+                </button>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('finishModal')">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button class="btn btn-success btn-glow" onclick="finishService()">
+                    <i class="fas fa-check"></i> Concluir Serviço
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal">
+        <div class="modal-content modal-center">
+            <div class="success-animation">
+                <div class="check-circle">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="confetti"></div>
+            </div>
+            
+            <h2>Serviço Concluído!</h2>
+            <p>O cliente será notificado em 6 meses para novo agendamento.</p>
+            
+            <div class="next-contact-box">
+                <i class="fas fa-calendar-check"></i>
+                <div>
+                    <span>Próximo contato:</span>
+                    <strong id="nextContactDate">-</strong>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary btn-large btn-glow" onclick="closeModal('successModal')">
+                <i class="fas fa-thumbs-up"></i> OK, Entendi
+            </button>
+        </div>
+    </div>
+
+    <!-- Details Modal -->
+    <div id="detailsModal" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2><i class="fas fa-user"></i> Detalhes do Cliente</h2>
+                <button class="close-btn" onclick="closeModal('detailsModal')">&times;</button>
+            </div>
+            <div id="detailsContent" class="modal-body"></div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <i class="fas fa-info-circle"></i>
+        <span id="toastMessage">Mensagem</span>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/app.js"></script>
+    
+    <!-- Register Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('Service Worker registrado'))
+                .catch(err => console.log('Erro no Service Worker:', err));
+        }
+    </script>
+</body>
+</html>
